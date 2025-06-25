@@ -1,0 +1,36 @@
+# Unified Events System - Subdirectory .htaccess
+# Place this in /leads/33/.htaccess
+
+# Prevent WordPress from handling requests in this directory
+RewriteEngine On
+
+# IMPORTANT: Stop WordPress from processing our URLs
+RewriteRule ^index\.php$ - [L]
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+
+# Route API requests to our API handler
+RewriteRule ^api/(.*)$ api/index.php [L,QSA]
+
+# Allow direct access to dashboard
+RewriteRule ^dashboard/(.*)$ dashboard/$1 [L]
+
+# Block access to sensitive directories
+RewriteRule ^(src|workers|migrations|logs|tests|vendor)/ - [F,L]
+
+# Protect sensitive files
+<FilesMatch "\.(env|json|lock|log)$">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+
+# Prevent directory listing
+Options -Indexes
+
+# PHP settings (if needed)
+<IfModule mod_php7.c>
+    php_value upload_max_filesize 10M
+    php_value post_max_size 10M
+    php_value max_execution_time 300
+    php_value max_input_time 300
+</IfModule>
